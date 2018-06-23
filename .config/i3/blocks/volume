@@ -1,0 +1,8 @@
+#!/bin/bash
+
+vol_cur=$(amixer -D pulse get Master | grep -E -o '[0-9]{1,3}?%' | head -1 | sed 's/%//')
+mute=$(amixer -D pulse get Master | grep -E -o '\[[onf]{2,3}\]' | head -1 | sed 's/\[//; s/\]//')
+
+printf "%s%%" $vol_cur
+[[ "$mute" != "on" ]] && { exit 33; }
+exit 0

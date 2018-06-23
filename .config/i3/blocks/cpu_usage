@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+#
+
+from psutil import cpu_percent as cpu_util
+from color_fade import rgg as color
+
+if __name__ == '__main__':
+  name = 'cpu_util'
+  util = cpu_util(interval=0.5)
+
+  c = color(util, min=0.00, max=100.00, invert=True)
+
+  print('{}%\n{}\n{}'.format(util, name, c))

@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+
+sas_server=('lnzlwlgsvaw01' 'lnzlwlgsvaw02' 'lnzlwlgsvaw03' 'lnzlwlgsweb01' 'lnzlwlgsvar01' 'lnzlwlgsoaem01' 'lnzlwlgsmd01' 'lnzlwlgsmo01' 'lnzlwlgsva01')
+
+for server in ${sas_server[@]}; do
+  echo "collecting from: $server"
+  scp $server:/var/tmp/sosreport-* .
+done
+
+echo done

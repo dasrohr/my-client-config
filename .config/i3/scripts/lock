@@ -1,0 +1,59 @@
+#!/bin/bash
+ 
+scrot /tmp/screen.png
+# change the effect of the lockscreen, valid choises: pixel, blur
+# note that blur is MUCH slower!
+effect='pixel'  
+
+if [[ "$effect" == "pixel" ]]
+then
+  convert /tmp/screen.png -scale 10% -scale 1000% /tmp/screen.png
+elif [[ "$effect" == "blur" ]]
+then
+  convert /tmp/screen.png -blur 0x8 -level 0,100% /tmp/screen.png
+else
+  #fallback to pixel
+  convert /tmp/screen.png -scale 10% -scale 1000% /tmp/screen.png
+fi
+
+# make icon optional - uncomment if icon should be displayed on lockscreen
+#  will delay lock process depending on the amount of displays and used resolution
+# icon=1
+if [ $icon ]; then
+  icon="$HOME/.config/i3/scripts/lock.png"
+   
+  IFS=$'\n'
+  res=($(xrandr -q | grep "*" | awk '{print $1}'))
+  unset IFS
+  read pic_x pic_y <<< $(file $icon | grep -o '[0-9]* x [0-9]*' | awk -F " x " '{print $1, $2}')
+  
+  [[ ${#res[*]} -gt 1 ]] && multi_mon=1
+  
+  if [ $multi_mon ]; then
+    for screen in ${res[@]}; do
+      read screen_x screen_y <<< $(echo $screen | awk -F "x" '{print $1, $2}')
+  
+      offset_x=$(($screen_x/2 - $pic_x/2))
+      offset_y=$(($screen_y/2 - $pic_y/2))
+  
+      [[ $screen_y -eq 1440 ]] && offset_y=$(($offset_y + 1080))
+  
+      convert /tmp/screen.png $icon -geometry +$offset_x+$offset_y -composite -matte  /tmp/screen.png
+    done
+  else
+    convert /tmp/screen.png $icon -gravity center -composite -matte  /tmp/screen.png
+  fi
+fi
+
+player_status=$(qdbus org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get org.mpris.MediaPlayer2.Player PlaybackStatus)
+
+if [ "$player_status" = "Playing" ]; then
+  dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
+  stopped=1
+fi
+
+i3lock -e -n -f -u -i /tmp/screen.png
+
+[[ $stopped ]] && dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Play
+
+rm /tmp/screen.png

@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+#
+
+from psutil import sensors_battery as bat
+from psutil import POWER_TIME_UNLIMITED 
+from psutil import POWER_TIME_UNKNOWN
+from color_fade import rgg as color
+
+from os import environ as env
+import notify2
+
+
+if __name__ == '__main__':
+  icon = ''
+  name = 'power'
+  power, remain, charging = bat()
+
+  if power > 100:
+      power = 100
+
+  if charging:
+    indicator = ' .'
+  else:
+    indicator = ''
+
+  if remain == POWER_TIME_UNLIMITED:
+    remain = ''
+  elif remain == POWER_TIME_UNKNOWN:
+    remain = ' ?'
+  else:
+    remain = remain / 60 / 60
+    remain = ' %.1fh' % remain
+
+  if power <= 10:
+    icon = 'bat_low.png'
+
+  if power <= 5:
+    icon = 'bat_dead.png'
+
+  if power <= 2:
+    from os import system as call
+    call(env['HOME'] + '.config/i3/scripts/suspend')
+
+  if icon:
+    n = notify2.init('battery_warning')
+    n = notify2.Notification('Battery warning', 'Power is down to ' + str(int(power)) + '%', env['HOME'] + '/.config/i3/blocks/icons/' + icon)
+    n.set_timeout(25000)
+    n.set_urgency(2)
+    n.show()
+
+  c = color(power)
+
+  print('{}%{}{}\n{}\n{}'.format(int(power), remain, indicator, name, c))

@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+
+toggle_spotify() {
+	i3-msg '[class="Spotify"] scratchpad show'
+}
+
+spotify=$(pgrep -f /usr/share/spotify/spotify | head -1)
+
+if [ $spotify ]; then
+	toggle_spotify
+else
+	spotify &
+	sleep 1
+	toggle_spotify
+fi

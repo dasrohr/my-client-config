@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+#
+
+from psutil import os
+from color_fade import rgg as color
+
+if __name__ == '__main__':
+  name = 'loadavg'
+  load = os.getloadavg()[0]
+
+  c = color(load, min=0.00, max=4.00, invert=True)
+
+  print('{}\n{}\n{}'.format(load, name, c))

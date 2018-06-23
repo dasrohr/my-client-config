@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+
+state=$(light | sed 's/\..*$//')
+action=$1
+
+if [[ $state -le 10 ]]; then
+  step=2
+else
+  step=10
+fi
+
+case $action in
+  up)    [[ $state -lt 90 ]] && light -A $step || light -S 100
+         icon="full"
+         ;;
+  down)  [[ $state -gt 2 ]] && light -U $step || light -S 2
+         icon="low"
+         ;;
+esac
+
+state=$(light | sed 's/\..*$//')
+
+notify-send "Backlight" -h int:value:$state -a brigtness -c $action

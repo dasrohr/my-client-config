@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+
+# define a PID file to avoid beeing executed twice
+[[ -d /run/user/${UID} ]] && PID="/run/user/${UID}/massey-tunnel" || PID="/tmp/massey-tunnel.pid"
+
+# /etc/hosts
+hostfile="/etc/hosts"
+
+# massey hosts to route against localhost when tunnel is active
+hosts=('stash.massey.ac.nz' 'vagrancy.massey.ac.nz' 'nexus.massey.ac.nz')
+
+add() {
+  host=$1
+  if [ "$(grep $host $hostfile)" ]; then
+    echo "skipping - $host is already exist: ($(grep $host $hostfile))"
+    # remove the entry from our list so that is does not get removed on cleanup - might be there for a reason?!
+    for no in ${!hosts[@]}; do
+      [[ "${hosts[$no]}" = "$host" ]] && hosts[$no]=''
+    done
+  else
+    echo -n "adding $host to $hostfile - "
+    sudo -- sh -c -e "echo '127.0.0.1 $host' >> $hostfile";
+    if [ ! "$(grep $host $hostfile)" ]; then
+      echo "er"
+    else
+      echo "ok"
+    fi
+  fi
+}
+
+remove() {
+  host=$1
+  if [ "$(grep $host $hostfile)" ]; then
+    echo -n "remove $host from $hostfile - "
+    sudo sed -i "/$host/d" $hostfile;
+    if [ "$(grep $host $hostfile)" ]; then
+      echo "er"
+    else
+      echo "ok"
+    fi
+  else
+    echo "?? - $host is not in $hostfile"
+  fi
+}
+
+
+# check for already running tunnel
+[[ -f $PID ]] && { echo "it seems that there is already a tunnel running."; exit 1; } || touch $PID
+
+# create backup of /etc/hosts, in case we are messing up things ...
+sudo cp $hostfile $hostfile.bak_massey_edit
+
+# add all hosts to /etc/hosts to route them against localhost for LocalForwarding via SSH
+for host in ${hosts[@]}; do
+  add $host
+done
+
+# start tunnel
+ssh massey-tunnel
+
+# cleanup
+for host in ${hosts[@]}; do
+  remove $host
+done
+
+# remove PID file
+rm $PID

@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+
+dev=$(xinput list --id-only "SynPS/2 Synaptics TouchPad")
+state=$(xinput list-props ${dev} | awk -F ":" '/Device Enabled/ {print $2}')
+
+# toogle state for xinput command
+[[ $state -eq 1 ]] && state="disable" || state="enable"
+
+xinput $state $dev
+
+pkill -RTMIN+12 i3blocks

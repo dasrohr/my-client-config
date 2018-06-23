@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+
+dev=$(xinput list --id-only "SynPS/2 Synaptics TouchPad")
+state=$(xinput list-props ${dev} | awk -F ":" '/Device Enabled/ {print $2}')
+
+[[ $state -eq 1 ]] && echo . || echo 

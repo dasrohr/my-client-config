@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+
+sink_out=$(pactl list sinks | awk '
+  /Sink / { gsub(/Sink\ #/,""); sink=$0 }
+  /Name:/ { if ($2 ~ /bluez_sink\..+/) { print sink } }
+  ')
+
+sink_in=$(pactl list sink-inputs | awk '
+  /Sink Input/ { gsub(/Sink\ Input\ #/,""); sink=$0 }
+  /media.name/ { if ($3 ~ /\"Spotify\"/) { print sink } }
+  ')
+
+[[ ! $sink_out ]] && { notify-send "Switch to BT-Audio" "can not find any BT-Audio output"; exit 1; }
+[[ ! $sink_in ]] && { notify-send "Switch to BT-Audio" "can not find a Spotify playback Instance"; exit 1; }
+
+pactl set-default-sink $sink_out
+pactl move-sink-input $sink_in $sink_out
+
+# update i3 blocks volume block
+pkill -RTMIN+1 i3blocks
+
+notify-send "Switch to BT-Audio" "success"

@@ -1,0 +1,319 @@
+# i3 config file (v4)
+
+set $mod Mod4
+set $mod_r Super_R
+set $alt Mod1
+set $ctl control
+
+# name of wallpaper file in ~/Pictures
+set $wallpaper wallpaper_6.jpg
+
+set $exec_lock       exec --no-startup-id $HOME/.config/i3/scripts/lock
+set $exec_suspend    exec --no-startup-id $HOME/.config/i3/scripts/suspend
+set $exec_audio      exec --no-startup-id $HOME/.config/i3/scripts/volume
+set $exec_backlight  exec --no-startup-id $HOME/.config/i3/scripts/backlight
+set $exec_spotify    exec --no-startup-id $HOME/.config/i3/scripts/spotify
+set $exec_bt_spotify exec --no-startup-id $HOME/.config/i3/scripts/bt_spotify
+set $exec_touchpad   exec --no-startup-id $HOME/.config/i3/scripts/touchpad
+set $exec_comp       exec --no-startup-id dbus-launch compton
+#set $exec_comp       exec --no-startup-id xcompmgr -n -f -t -15 -l -17 -o 1 -F -c -C
+set $mode_def        mode "default"
+set $terminal        gnome-terminal
+
+font pango:System San Francisco Display Thin 10
+
+# enable back and forth
+workspace_auto_back_and_forth yes
+# delay urgent removal after focus
+force_display_urgency_hint 500 ms
+
+# workspaces #
+##############
+set $ws1 "1: "
+set $ws2 "2: "
+set $ws3 "3: "
+set $ws4 "4: "
+set $ws5 "5: "
+set $ws6 "6: "
+set $ws7 "7: "
+set $ws8 "8: "
+set $ws9 "9: "
+set $ws10 "10: "
+
+# border
+default_border pixel 0
+default_floating_border pixel 0 
+
+# gapps
+gaps inner 12
+gaps outer 0
+workspace $ws2 gaps inner 0
+workspace $ws2 gaps outer 0
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# keybindings #
+###############
+# kill active
+bindsym $mod+Shift+q kill
+# change focus
+bindsym $mod+j focus left
+bindsym $mod+k focus down
+bindsym $mod+l focus up
+bindsym $mod+semicolon focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+# move focused window
+bindsym $mod+Shift+j move left
+bindsym $mod+Shift+k move down
+bindsym $mod+Shift+l move up
+bindsym $mod+Shift+semicolon move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+# new window orientation
+bindsym $mod+h split h
+bindsym $mod+v split v
+# fullscreen
+bindsym $mod+f fullscreen toggle
+# change layout
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+# toggle tiling / floating all
+bindsym $mod+Shift+space floating toggle
+# toggle tiling / floating focus
+bindsym $mod+space focus mode_toggle
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+# move focus to ws
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+# lock
+bindsym $ctl+$alt+l $exec_lock
+# reload
+bindsym $mod+Shift+c reload
+# restart
+bindsym $mod+Shift+r "exec --no-startup-id killall xcompmgr; restart; $exec_comp"
+# exit
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# modes #
+#########
+bindsym $mod+g mode "gaps"
+mode "gaps" {
+
+        bindsym plus   gaps inner current plus 5
+        bindsym minus  gaps inner current minus 5
+        bindsym r      gaps inner current set 19; $mode_def
+        bindsym 0      gaps inner current set 0; $mode_def
+        bindsym Return $mode_def
+        bindsym Escape $mode_def
+}
+
+bindsym $mod+r mode "resize"
+mode "resize" {
+        bindsym j         resize shrink width 10 px or 10 ppt
+        bindsym k         resize grow height 10 px or 10 ppt
+        bindsym l         resize shrink height 10 px or 10 ppt
+        bindsym semicolon resize grow width 10 px or 10 ppt
+        bindsym Left      resize shrink width 2 px or 2 ppt
+        bindsym Down      resize grow height 2 px or 2 ppt
+        bindsym Up        resize shrink height 2 px or 2 ppt
+        bindsym Right     resize grow width 2 px or 2 ppt
+        bindsym Return    $mode_def
+        bindsym Escape    $mode_def
+}
+
+bindsym $mod+$alt+s mode "system"
+mode "system" {
+	bindsym Shift+s exec --no-startup-id systemctl poweroff; $mode_def
+	bindsym r exec --no-startup-id systemctl reboot
+	bindsym s $exec_suspend
+        bindsym Return $mode_def
+        bindsym Escape $mode_def
+}
+
+bindsym $mod+Shift+a mode "goto"
+mode "goto" {
+	bindsym e [class="Evolution"] focus; $mode_def
+        bindsym Return $mode_def
+        bindsym Escape $mode_def
+}
+
+bindsym $mod+a mode "app_run"
+mode "app_run" {
+	bindsym e exec evolution; $mode_def
+	bindsym f exec chromium-browser; $mode_def
+	bindsym Shift+f exec chromium-browser --new-window "https://web.whatsapp.com"; $mode_def
+	bindsym t exec thunar; $mode_def
+        bindsym Return $mode_def
+        bindsym Escape $mode_def
+}
+
+bindsym $mod+d exec rofi -show run
+bindsym $mod+Shift+d mode "launcher"
+mode "launcher" {
+  bindsym s exec rofi -show ssh; $mode_def
+  bindsym w exec rofi -show window; $mode_def
+  bindsym Return $mode_def
+  bindsym Escape $mode_def
+}
+bindsym $mod+Shift+m mode "monitor"
+mode "monitor" {
+  bindsym m exec --no-startup-id xrandr --output eDP-1 --primary --mode 2560x1440 --pos 0x0    --rotate normal --output HDMI-2 --off                                      --output HDMI-1 --off --output DP-1 --off --output DP-2 --off; $mode_def; restart
+  bindsym w exec --no-startup-id xrandr --output eDP-1 --primary --mode 2560x1440 --pos 0x1080 --rotate normal --output HDMI-2 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-1 --off --output DP-1 --off --output DP-2 --off; $mode_def; restart
+  bindsym h exec --no-startup-id xrandr --output eDP-1 --primary --mode 1920x1080 --pos 0x1080 --rotate normal --output HDMI-2 --off                                      --output HDMI-1 --off --output DP-1 --off --output DP-2 --off; $mode_def; restart
+  bindsym Return $mode_def
+  bindsym Escape $mode_def
+}
+
+# colors #
+##########
+set $bg-color 	         #2f343f
+set $inactive-bg-color   #2f343f
+set $text-color          #FFFFFF
+set $inactive-text-color #676E7D
+set $urgent-bg-color     #E53935
+set $indicator           #a30bef
+set $border-color        #00ff00
+
+# window coloring #
+###################
+#                       border              background         text                 indicator  child-border
+client.focused          $border-color       $bg-color          $text-color          $indicator $border-color
+client.unfocused        $inactive-bg-color  $inactive-bg-color $inactive-text-color $indicator
+client.focused_inactive $inactive-bg-color  $inactive-bg-color $inactive-text-color $indicator
+client.urgent           $urgent-bg-color    $urgent-bg-color   $text-color          $indicator $urgent-bg-color 
+
+bar {
+  position bottom
+  status_command i3blocks -c $HOME/.config/i3/blocks/config
+  tray_output primary
+  colors {
+    background $bg-color
+    separator #757575
+    #                  border             background         text
+    focused_workspace  $bg-color          $bg-color          $text-color
+    inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
+    urgent_workspace   $urgent-bg-color   $urgent-bg-color   $text-color
+  }
+}
+
+
+# my bindings #
+###############
+# launching
+bindsym $mod+Return exec $terminal
+bindsym $mod+Shift+Return exec $terminal --role=float
+bindsym $mod+t exec thunar
+
+# sticky window
+bindsym $mod+Shift+s sticky toggle
+
+# move workspaces to other display
+bindsym $mod+$alt+Up move workspace to output up
+bindsym $mod+$alt+Down move workspace to output down
+
+# workspace selector
+bindsym $mod+o exec --no-startup-id "$HOME/.config/i3/scripts/workspace list"
+bindsym $mod+i exec --no-startup-id "$HOME/.config/i3/scripts/workspace new"
+
+# scratchpad
+# Make the currently focused window a scratchpad
+bindsym $mod+Shift+minus move scratchpad
+# Show the first scratchpad window
+bindsym $mod+minus scratchpad show
+# Show specific window from scratchpad if exists
+bindsym $mod_r [class="KeePass2"] scratchpad show
+bindsym $mod+c [class="KeePass2"] scratchpad show
+# ban window to scratchpad
+for_window [class="KeePass2" title=".*KeePass$"] move scratchpad
+for_window [class="Spotify"] move scratchpad
+
+# spotify #
+###########
+# start and/or toggle spotify
+bindsym $mod+m $exec_spotify
+# Spotify control
+bindsym $mod+period exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next; sleep 0.5; pkill -RTMIN+2 i3blocks"
+bindsym $mod+comma exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous; sleep 0.5; pkill -RTMIN+2 i3blocks"
+bindsym $mod+slash exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause; pkill -RTMIN+2 i3blocks"
+bindsym XF86AudioPlay exec --no-startup-id "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause; pkill -RTMIN+2 i3blocks"
+# map Spotify output to Bluetooth device
+bindsym $mod+b $exec_bt_spotify
+
+# screenshot
+bindsym --release Print exec --no-startup-id "scrot -s --exec 'mv $f /home/toniwarnecke/Pictures/'"
+
+# special keys
+bindsym XF86AudioRaiseVolume $exec_audio up
+bindsym XF86AudioLowerVolume $exec_audio down
+bindsym XF86AudioMute $exec_audio mute
+bindsym XF86MonBrightnessUp $exec_backlight up
+bindsym XF86MonBrightnessDown $exec_backlight down
+# switch for i3blocks CAPS Lock indicator
+bindsym --release Caps_Lock exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
+bindsym --release Num_Lock  exec --no-startup-id pkill -SIGRTMIN+11 i3blocks
+# toggle touchpad
+bindsym XF86Explorer $exec_touchpad
+
+# conky #
+#########
+bindsym $mod+p [class="Conky"] scratchpad show
+for_window [class="Conky"] floating enable
+for_window [class="Conky"] move scratchpad
+for_window [class="Conky"] sticky enable
+
+# floating windows
+for_window [window_role="float"] floating enable
+for_window [window_role="EMsgComposer-.*"] floating enable
+for_window [class="KeePass2"] floating enable
+for_window [title="Open Database File"] floating enable
+for_window [title="Select key file manually"] floating enable
+
+# permanent stacking
+for_window [class="Evolution"] layout stacking
+
+# ban window to workspace
+assign [class="Chromium-browser" title=!"Save\sFile"] $ws1
+assign [class="Evolution"] $ws2
+assign [class="Code"] $ws4
+for_window [class="Code"] focus
+assign [class="Hexchat"] $ws9
+for_window [title="WhatsApp.*"] move to workspace $ws10
+
+# auto start #
+##############
+# always
+# set wallpaper
+exec_always feh --no-startup-id --bg-scale $HOME/Pictures/$wallpaper
+
+# on login
+# autostart programs
+exec chromium-browser
+exec evolution
+exec hexchat
+# enable visual effects in x
+$exec_comp

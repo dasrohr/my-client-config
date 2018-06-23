@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+
+meta=$(qdbus org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Metadata)
+artist=$(echo "$meta" | grep "xesam:artist:" | sed 's/xesam\:artist\:\ //')
+track=$(echo "$meta" | grep "xesam:title: " | sed 's/xesam\:title\:\ //')
+
+state=$(qdbus org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlaybackStatus)
+
+case $state in
+  Playing)  state="";;
+  Paused)   state="";;
+  *)        state="?"
+            exit 0;;
+esac
+
+[[ ! $artist ]] && output='advertisment' || output="$artist - $track"
+
+printf '%s   %s' "$state" "$output"
